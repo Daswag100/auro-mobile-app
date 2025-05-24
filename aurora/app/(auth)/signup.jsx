@@ -2,7 +2,7 @@ import { SafeAreaView } from "react-native-safe-area-context"
 import {Text, Image, TextInput, View, TouchableOpacity, Pressable} from 'react-native'
 import styles from '../styles.js'
 import Colors from '../../constants/Colors'
-import authStyles from './style.js'
+import authStyles from './styles3.js'
 import Button from '../../components/Button';
 import { router } from "expo-router"
 import { useState } from "react"
@@ -114,7 +114,11 @@ return (
    </View>
 
     <View style = {authStyles.buttonContainer}>
-<Button text = {'Sign Up'}/>
+<Button text = {'Sign Up'} onPress={()=> {
+
+
+ router.navigate ('/home')
+}}/>
 </View>
 
 <TouchableOpacity onPress = {() => router.navigate ('/login')}>
