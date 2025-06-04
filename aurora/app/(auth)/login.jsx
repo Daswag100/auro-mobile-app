@@ -112,8 +112,9 @@ return (
 
 <TouchableOpacity onPress = {() => router.navigate ('/signup')}>
 
-<Text style = {authStyles.footerNote}> Don't have an account? 
-    <Text style = {authStyles.login} > Sign Up </Text> </Text>
+<Text style = {authStyles.footerNote}> {" Don't have an account?"} 
+    <Text style = {authStyles.login} > Sign Up </Text>
+     </Text>
  </TouchableOpacity>   
 
 

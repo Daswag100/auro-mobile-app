@@ -116,15 +116,30 @@ useEffect(() => {
 
               <FlatList
 
-              data={topMovieData}
+              data={topMovieData.filter(movie=>{
+
+              const film = movie.originalTitle?.toLowerCase().includes
+              (query.toLowerCase())
+
+                return film;
+              })}
 
               renderItem={(movie)=> {
 
-                // console.log('My Movie Data', movie.item.primaryImage);
-
                 return (
 
-                  <TouchableOpacity onPress={()=> router.navigate ('/details') } style= {{marginVertical: 20,}}>
+                  <TouchableOpacity onPress={()=>{
+                   router.push({
+                    pathname: '/details',
+
+                    params: {film : JSON.stringify (movie)}
+                    
+
+                   }) 
+                  }}
+                   
+                   
+                   style= {{marginVertical: 20,}}>
 
                     <Image resizeMode='contain' 
                     style={{width: '100%', height: 500,}}
