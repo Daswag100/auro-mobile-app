@@ -7,7 +7,7 @@ import Button from "@/components/Button";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import Webview, { WebView } from "react-native-webview";
+import { WebView } from "react-native-webview";
 
 const Details = () => {
 
