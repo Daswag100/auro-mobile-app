@@ -1,5 +1,6 @@
 import { SafeAreaView } from "react-native-safe-area-context";
-import {Text, Image, View, ScrollView, TouchableOpacity, Linking, Pressable, Alert} from "react-native";
+import {Text, View, ScrollView, TouchableOpacity, Linking, Pressable, Alert, ActivityIndicator} from "react-native";
+import { Image } from 'expo-image'; // Use expo-image for faster loading
 import { useLocalSearchParams } from "expo-router";
 import styles from "../styles";
 import Colors from '../../constants/Colors';
@@ -8,40 +9,54 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { WebView } from "react-native-webview";
+import { useState } from "react";
 
 const Details = () => {
 
 const data = useLocalSearchParams();
+const [imageLoading, setImageLoading] = useState(true);
 // console.log('Details Page Data', data.film);
 
 const movie = JSON.parse(data.film)
 console.log('Parsed Movie Data', movie.item.originalTitle, typeof movie);
 
+// Optimize image URL for 2MB quality - excellent detail and sharpness
+const optimizedImageUrl = movie?.item?.primaryImage 
+  ? movie.item.primaryImage.replace('._V1_', '._V1_UY750_CR0,0,500,750_AL_')
+  : null;
+
 const saveToWatchLater = async () => {
   try {
+    // Get all existing saved movie keys
+    const allKeys = await AsyncStorage.getAllKeys();
+    const movieKeys = allKeys.filter(key => key.startsWith('movie'));
+    
+    // Check if this movie is already saved
+    const movieTitle = movie.item.originalTitle?.toLowerCase().replace(/[^a-zA-Z0-9]/g, '_') || 'unknown';
+    const existingMovie = movieKeys.find(key => 
+      key.toLowerCase().includes(movieTitle.toLowerCase())
+    );
+    
+    if (existingMovie) {
+      Alert.alert('Already Saved!', 
+        `"${movie.item.originalTitle}" is already in your saved list.`);
+      return;
+    }
+    
+    // Create a unique key for new movie
+    const movieKey = `movie_${movieTitle}_${Date.now()}`;
+    
+    // Save movie with unique key
+    await AsyncStorage.setItem(movieKey, JSON.stringify(movie.item));
+    
+    Alert.alert('Success!!!',
+      `You have successfully saved "${movie.item.originalTitle}" to your watch later list.`);
 
-    await AsyncStorage.setItem('movie', JSON.stringify (movie.item), (error)=> {
-
-    }).then((error) => {
-      // Alert.alert('Success!!!', 'You have successfully saved ' + movie.item.originalTitle 
-      //    +  ' to your watch later list');
-
-          Alert.alert('Success!!!',
-            ` You have successfully saved ${movie.item.originalTitle} to your watch later list.`);
-
-
-         console.log('Movie saved successfully:', movie.item.originalTitle);
-  }).catch((error) => {
-    Alert.alert('Error!!!',
-     ` Error occured while saving ${movie.item.originalTitle} to your watch later list.`);
-      console.error('Error saving movie:', error);
-    });
-}
-
-
-
-  catch (error) {
+    console.log('✅ Movie saved successfully:', movie.item.originalTitle);
+    
+  } catch (error) {
     Alert.alert('Error!!!', 'There was an error saving the movie');
+    console.error('❌ Error saving movie:', error);
   }
 }
 
@@ -59,16 +74,59 @@ const saveToWatchLater = async () => {
               </Pressable>
 
               <TouchableOpacity onPress={() => {
-
                 Linking.openURL(movie?.item.url)
               }}>
                 
-        
-            <Image resizeMode='contain' 
-                    style={{width: '100%', height: 500, marginTop: -30}}
-                     source={{uri:movie?.item.primaryImage}} />
+                <View style={{
+                  width: '100%', 
+                  height: 500, 
+                  marginTop: -30, 
+                  borderRadius: 12,
+                  backgroundColor: '#1a1a1a',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  overflow: 'hidden'
+                }}>
+                  
+                  {/* Loading indicator - shows while image loads */}
+                  {imageLoading && (
+                    <View style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      backgroundColor: '#1a1a1a',
+                      zIndex: 1
+                    }}>
+                      <ActivityIndicator size="large" color={Colors.primary} />
+                      <Text style={{
+                        color: 'white',
+                        marginTop: 10,
+                        fontFamily: 'PoppinsRegular'
+                      }}>
+                        Loading image...
+                      </Text>
+                    </View>
+                  )}
+                  
+                  {/* The actual image */}
+                  <Image 
+                    contentFit='cover' 
+                    style={{width: '100%', height: '100%'}}
+                    source={optimizedImageUrl}
+                    transition={300}
+                    cachePolicy="memory-disk"
+                    priority="high"
+                    allowDownscaling={true}
+                    onLoad={() => setImageLoading(false)}
+                    onError={() => setImageLoading(false)}
+                  />
+                </View>
 
-                     </TouchableOpacity>
+              </TouchableOpacity>
 
                      <View style= {{flexDirection: 'row',
                        justifyContent: 'space-between', marginTop: 20,}}>
@@ -102,7 +160,7 @@ const saveToWatchLater = async () => {
 
                             <Text style= {{color: 'white', fontFamily: 'SemiBold',
                               fontSize: 16, marginTop: 10}}>
-                              Genres: {movie?.item?.genres.join(', ')} </Text>
+                              Genres: {movie?.item?.genres?.join(', ')} </Text>
 
                             <Text style= {{color: 'white', fontFamily: 'SemiBold',
                               fontSize: 16, marginTop: 10}}>
@@ -127,15 +185,15 @@ const saveToWatchLater = async () => {
                               {
                                 movie?.item.trailer && (
                                  
-                                  <View style ={{height: 150, width: '104%',
+                                  <View style ={{height: 150, width: '117%',
                                    marginTop: 20, borderRadius: 10, overflow: 'hidden'}}>
                                     <WebView
 
                                     source={{uri: movie?.item.trailer}}
                                     style = {{flex:1}}
-                                    javaScriptEnabled={true}
+                                     javaScriptEnabled={true}
                                     domStorageEnabled={true}
-                                    allowsInlineMediaPlayback={true}
+                                     allowsInlineMediaPlayback={true}
                                     allowsFullscreenVideo={true} 
                                     />
                                     </View>

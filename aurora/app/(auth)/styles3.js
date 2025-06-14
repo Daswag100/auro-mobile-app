@@ -62,7 +62,7 @@ authText: {
     },
 
     image: {
-        width: 115,
+        width: 150,
     },
 
     positionPassword: {
