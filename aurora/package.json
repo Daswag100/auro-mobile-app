@@ -47,7 +47,12 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@react-native-community/cli": "^18.0.0",
+<<<<<<< Updated upstream
     "@types/react": "^19.0.10",
+=======
+    "@types/babel__generator": "^7.27.0",
+    "@types/react": "~19.0.10",
+>>>>>>> Stashed changes
     "eslint": "^9.25.0",
     "eslint-config-expo": "^9.2.0",
     "typescript": "^5.8.3"

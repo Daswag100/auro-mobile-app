@@ -2,9 +2,15 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { Platform } from 'react-native';
+<<<<<<< Updated upstream
 import Colors from '@/constants/Colors';
 import { HomeIcon, CreateIcon, ProfileIcon, SavedIcon } from '../../components/icon';
 import styles2 from './styles'; // Import your clean styles
+=======
+// Update the import path below to the correct relative path if the file exists, for example:
+import Colors from '../../constants/Colors';
+
+>>>>>>> Stashed changes
 
 export default function TabLayout() {
   return (

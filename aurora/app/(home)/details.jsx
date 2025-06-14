@@ -4,7 +4,7 @@ import { Image } from 'expo-image'; // Use expo-image for faster loading
 import { useLocalSearchParams } from "expo-router";
 import styles from "../styles";
 import Colors from '../../constants/Colors';
-import Button from "@/components/Button";
+import Button from "../../components/Button";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
